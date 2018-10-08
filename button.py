@@ -6,7 +6,7 @@ from neopixel import *
 from termcolor import colored, cprint
 
 # LED strip configuration:
-LED_COUNT      = 1      # Number of LED pixels.
+LED_COUNT      = 4      # Number of LED pixels.
 LED_PIN        = 21      # GPIO pin connected to the pixels (21 uses PCM!).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 5       # DMA channel to use for generating signal (try 5)
@@ -63,12 +63,22 @@ def resetColors():
     strip.setPixelColor(0, Color(0,0,0))
     strip.show()
 
+def floodColor(strip, color, timeout):
+    for position in range(size):
+        strip.setPixelColor(position, color)
+        strip.show()
+        time.sleep(timeout)
+
 # Create NeoPixel object with appropriate configuration.
 strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT)
 # Intialize the library (must be called once before other functions).
 strip.begin()
 
 print "READY"
+
+
+floodColor(strip, Color(50,50,50), 0.2)
+floodColor(strip, Color(0,0,0), 0.2)
 
 while True:
     reset = not GPIO.input(26)
@@ -91,14 +101,14 @@ while True:
                         changed = False
                 elif (newColorName == 'reset'):
                     colors[position] = 'grey'
-                    strip.setPixelColor(0, Color(0,0,0))
+                    strip.setPixelColor(position, Color(0,0,0))
                     strip.show()
                     changed = False
                     position = (position + 1) % size
                     # resetColors()
                 else:
                     colors[position] = newColorName
-                    strip.setPixelColor(0, newColor)
+                    strip.setPixelColor(position, newColor)
                     strip.show()
                     changed = True
                 sys.stdout.write("\r" + ''.join([makeLight(colors[i], i == position) for i in range(size)]))
